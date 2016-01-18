@@ -119,7 +119,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
      */
     var engine = function(){
 
-        // check if the game is stopped
+        // we are not executing this if the game is stopped
         if (gameStopped) return;
 
         // make raw keyboard inputs better handel'ble
@@ -171,18 +171,8 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             );
         }
 
-        // check if ball collides with canvas's top border
-        if ((Ball.y - ballRadius) <= 0) {
-
-            // bounce the ball
-            BallVelocity = new Vector(
-                BallVelocity.x,
-                BallVelocity.y * -1
-            );
-        }
-
-        // check if ball collides with canvas's bottom border
-        if ((Ball.y + ballRadius) >= canvasHeight) {
+        // check if ball collides with canvas's top or bottom border
+        if ((Ball.y - ballRadius) <= 0 || (Ball.y + ballRadius) >= canvasHeight) {
 
             // bounce the ball
             BallVelocity = new Vector(
