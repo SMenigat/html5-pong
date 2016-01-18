@@ -52,7 +52,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     // players & scores
     if (!Player1Name) Player1Name = 'Player1';
     if (!Player2Name) Player2Name = 'Player2';
-    var scoreFinal = 10;
+    var scoreFinal = 5;
     var scorePlayer1 = 0;
     var scorePlayer2 = 0;
     var isMultiplayer = true;
@@ -198,22 +198,20 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         if (checkScore()) {
 
             // has one of the players won?
-            if (scorePlayer1 === scoreFinal) {
+            if (scorePlayer1 === scoreFinal || scorePlayer2 === scoreFinal) {
 
-                // print winning screen and stop the game
-                gameStopped = true;
-                return drawCenteredText(
-                    Player1Name + ' has won!',
+                // print winning screen
+                drawCenteredText(
+                    ((scorePlayer1 === scoreFinal) ? Player1Name : Player2Name) + ' has won!',
                     'Click the canvas to restart.'
                 );
-            } else if (scorePlayer2 === scoreFinal) {
 
-                // print winning screen and stop the game
-                gameStopped = true;
-                return drawCenteredText(
-                    Player2Name + ' has won!',
-                    'Click the canvas to restart.'
-                );
+                // reset the game, in case the game gets restarted
+                scorePlayer1 = scorePlayer2 = 0;
+                resetGameObjects();
+
+                // finaly we have to blur the canvas
+                return gameCanvas.blur();
             } else {
 
                 // nobody has won yet, so we are resetting the ball to the middle & are
