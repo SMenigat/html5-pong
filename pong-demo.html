@@ -7,7 +7,11 @@
     <script>
         // initialize the game
         window.onload = function () {
-            var Game = new PongGame('gameCanvas');
+            var Game = new PongGame(
+                'gameCanvas',
+                'Player1',
+                'Player2'
+            );
             Game.run();
         };
     </script>
