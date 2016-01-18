@@ -58,6 +58,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var isMultiplayer = true;
 
     // input control's
+    var keyboardInputMap = [];
     self.keyboardIO = {
         Player1Up: false,
         Player1Down: false,
@@ -84,9 +85,9 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             canvasHeight / 2
         );
 
-        // register event hanlder for keyboard inputs
-        document.addEventListener('keypress', keyboardIOHandler);
-        document.addEventListener('keyup', keyboardIOReset);
+        // update keymap on keydown / keyup
+        gameCanvas.addEventListener('keydown', keyboardInputHandler);
+        gameCanvas.addEventListener('keyup', keyboardInputHandler);
 
         // create the ball game object & give it a random velocity and direction
         resetBall();
@@ -109,6 +110,9 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
         // check if the game is stopped
         if (gameStopped) return;
+
+        // make raw keyboard inputs better handel'ble
+        updateKeyboardIO();
 
         // move the players bats
         if (self.keyboardIO.Player1Up && canBatBeMovedOnYAxis(Player1Bat, (gameSpeed * 2) * -1)) {
@@ -328,25 +332,30 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     };
 
     /**
+     * fills & updates keymap, saves if a certain key code is pressed as boolean
+     * @param event
+     */
+    var keyboardInputHandler = function(event) {
+        keyboardInputMap[event.keyCode] = (event.type == 'keydown');
+    };
+
+    /**
      * eventhandler for keypress events of document which sets the player's io states
      * @param event
      */
-    var keyboardIOHandler = function(event){
-
-        // detect pressed char code
-        var characterCode = (typeof event.which == "number") ? event.which : event.keyCode;
+    var updateKeyboardIO = function(){
 
         // if player1 moves the bat
-        if (characterCode == 119 || characterCode == 115) {
+        if (keyboardInputMap[87] || keyboardInputMap[83]) {
 
             // up
-            if (characterCode == 119) {
+            if (keyboardInputMap[87]) {
                 self.keyboardIO.Player1Up = true;
                 self.keyboardIO.Player1Down = false;
             }
 
             // down
-            else if (characterCode == 115) {
+            else if (keyboardInputMap[83]) {
                 self.keyboardIO.Player1Up = false;
                 self.keyboardIO.Player1Down = true;
             }
@@ -358,16 +367,16 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         }
 
         // if player1 moves the bat
-        if (characterCode == 111 || characterCode == 108) {
+        if (keyboardInputMap[79] || keyboardInputMap[76]) {
 
             // up
-            if (characterCode == 111) {
+            if (keyboardInputMap[79]) {
                 self.keyboardIO.Player2Up = true;
                 self.keyboardIO.Player2Down = false;
             }
 
             // down
-            else if (characterCode == 108) {
+            else if (keyboardInputMap[76]) {
                 self.keyboardIO.Player2Up = false;
                 self.keyboardIO.Player2Down = true;
             }
@@ -377,17 +386,6 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             self.keyboardIO.Player2Up = false;
             self.keyboardIO.Player2Down = false;
         }
-    };
-
-    /**
-     * resets the keyboard input events
-     * @param event
-     */
-    var keyboardIOReset = function(event) {
-        self.keyboardIO.Player1Up = false;
-        self.keyboardIO.Player1Down = false;
-        self.keyboardIO.Player2Up = false;
-        self.keyboardIO.Player2Down = false;
     };
 
     /**
