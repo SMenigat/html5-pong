@@ -41,7 +41,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var ballRadius = canvasWidth * ballRadiusRatio;
     var scoreFontSizeRatio = 0.03;
     var scoreFontSize = canvasWidth * scoreFontSizeRatio;
-    var winningMessageFontSize = scoreFontSize * 2;
+    var centeredMessageFontSize = scoreFontSize * 2;
 
     // game objects itself
     var Player1Bat;
@@ -74,23 +74,12 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // initialize the game canvas
         gameCanvas.style.backgroundColor = colorBackground;
 
-        // initialize the player bats
-        Player1Bat = new GameObject(
-            batBorderSpacing + (batWidth / 2),
-            canvasHeight / 2
-        );
-
-        Player2Bat = new GameObject(
-            canvasWidth - batBorderSpacing - (batWidth / 2),
-            canvasHeight / 2
-        );
-
         // update keymap on keydown / keyup
         gameCanvas.addEventListener('keydown', keyboardInputHandler);
         gameCanvas.addEventListener('keyup', keyboardInputHandler);
 
-        // create the ball game object & give it a random velocity and direction
-        resetBall();
+        // create the game objects & give the ball a random velocity and direction
+        resetGameObjects();
 
         // start the game engine
         engine();
@@ -191,16 +180,23 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
                 // print winning screen and stop the game
                 gameStopped = true;
-                return drawWinningScreen(Player1Name);
+                return drawCenteredText(
+                    Player1Name + ' has won!',
+                    'Press (R) to restart the game.'
+                );
             } else if (scorePlayer2 === scoreFinal) {
 
                 // print winning screen and stop the game
                 gameStopped = true;
-                return drawWinningScreen(Player2Name);
+                return drawCenteredText(
+                    Player2Name + ' has won!',
+                    'Press (R) to restart the game.'
+                );
             } else {
 
-                // nobody has won yet, so we are resetting the ball to the middle
-                resetBall();
+                // nobody has won yet, so we are resetting the ball to the middle & are
+                // readjusting the bats
+                resetGameObjects();
             }
         }
 
@@ -283,9 +279,20 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     /**
      * (re)creates the ball game object and generates a random velocity for it
      */
-    var resetBall = function(){
+    var resetGameObjects = function(){
 
-        // (re)create game object
+        // initialize the player bats
+        Player1Bat = new GameObject(
+            batBorderSpacing + (batWidth / 2),
+            canvasHeight / 2
+        );
+
+        Player2Bat = new GameObject(
+            canvasWidth - batBorderSpacing - (batWidth / 2),
+            canvasHeight / 2
+        );
+
+        // create ball object
         Ball = new GameObject(
             canvasWidth / 2,
             canvasHeight / 2
@@ -389,12 +396,9 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     };
 
     /**
-     * writes the winners name & reset information centered onto the canvas
-     * @param playerName
+     * clears all drawings from the canvas
      */
-    var drawWinningScreen = function(playerName) {
-
-        // clear all drawings from the canvas
+    var drawClear = function(){
         canvasContext.fillStyle = colorBackground;
         canvasContext.clearRect(
             0,
@@ -402,27 +406,36 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             canvasWidth,
             canvasHeight
         );
+    };
 
-        // prepare the winner message
-        var winningMessage = playerName + ' has won!';
+    /**
+     * clears the whole canvas and
+     * @param FatText
+     * @param SmallerText
+     */
+    var drawCenteredText = function(FatText, SmallerText) {
+
+        // clear all drawings from the canvas
+        drawClear();
 
         // draw the message
         canvasContext.fillStyle = colorScores;
-        canvasContext.font = 'bold ' + winningMessageFontSize + 'px Courier New';
+        canvasContext.font = 'bold ' + centeredMessageFontSize + 'px Courier New';
         canvasContext.fillText(
-            winningMessage,
-            (canvasWidth / 2) - (canvasContext.measureText(winningMessage).width / 2),
-            (canvasHeight / 2) - (winningMessageFontSize / 2)
+            FatText,
+            (canvasWidth / 2) - (canvasContext.measureText(FatText).width / 2),
+            (canvasHeight / 2) - (centeredMessageFontSize / 2)
         );
 
-        // draw reset information
-        var resetMessage = 'Press (R) to restart the game.';
-        canvasContext.font = 'bold ' + scoreFontSize + 'px Courier New';
-        canvasContext.fillText(
-            resetMessage,
-            (canvasWidth / 2) - (canvasContext.measureText(resetMessage).width / 2),
-            (canvasHeight / 2) + (winningMessageFontSize / 2)
-        );
+        // draw smaller text if available
+        if (SmallerText) {
+            canvasContext.font = 'bold ' + scoreFontSize + 'px Courier New';
+            canvasContext.fillText(
+                SmallerText,
+                (canvasWidth / 2) - (canvasContext.measureText(SmallerText).width / 2),
+                (canvasHeight / 2) + (centeredMessageFontSize / 2)
+            );
+        }
     };
 
     /**
@@ -431,13 +444,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var drawGame = function(){
 
         // clear all drawings from the canvas
-        canvasContext.fillStyle = colorBackground;
-        canvasContext.clearRect(
-            0,
-            0,
-            canvasWidth,
-            canvasHeight
-        );
+        drawClear();
 
         // draw player bats
         var bats = [Player1Bat, Player2Bat];
@@ -466,12 +473,15 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // draw the player's scores
         canvasContext.fillStyle = colorScores;
         canvasContext.font = 'bold ' + scoreFontSize + 'px Courier New';
+
+        // player1
         canvasContext.fillText(
             Player1Name + ' ' + scorePlayer1,
             batBorderSpacing,
             scoreFontSize
         );
 
+        // player2
         canvasContext.fillText(
             Player2Name + ' ' + scorePlayer2,
             canvasWidth - canvasContext.measureText(Player2Name + ' ' + scorePlayer2).width - batBorderSpacing,
