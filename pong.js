@@ -8,6 +8,13 @@
 var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var self = this;
 
+    // game performance settings
+    var drawRate = 10; // in milliseconds
+    var gameSpeed = 2;
+
+    // trigger that stops the game
+    var gameStopped = false;
+
     // canvas
     var gameCanvas = document.getElementById(gameCanvasNodeId);
     var canvasWidth = gameCanvas.width;
@@ -31,11 +38,13 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var ballRadius = canvasWidth * ballRadiusRatio;
     var scoreFontSizeRatio = 0.03;
     var scoreFontSize = canvasWidth * scoreFontSizeRatio;
+    var winningMessageFontSize = scoreFontSize * 2;
 
     // game objects itself
     var Player1Bat;
     var Player2Bat;
     var Ball;
+    var BallVelocity;
 
     // players & scores
     if (!Player1Name) Player1Name = 'Player1';
@@ -43,6 +52,14 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var scoreFinal = 10;
     var scorePlayer1 = 0;
     var scorePlayer2 = 0;
+
+    // input control's
+    var keyboarIO = {
+        Player1Up: false,
+        Player1Down: false,
+        Player1Up: false,
+        Player1Down: false
+    };
 
     /**
      * initializes the game and starts the game loop
@@ -52,7 +69,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // initialize the game canvas
         gameCanvas.style.backgroundColor = colorBackground;
 
-        // initialize the game objects
+        // initialize the player bats
         Player1Bat = new GameObject(
             batBorderSpacing + (batWidth / 2),
             canvasHeight / 2
@@ -63,21 +80,142 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             canvasHeight / 2
         );
 
+        // create the ball game object & give it a random velocity and direction
+        resetBall();
+
+        // start the game engine
+        engine();
+    };
+
+    /**
+     * game engine, calculates positions of game objects and players scores
+     */
+    var engine = function(){
+
+        // check if the game is stopped
+        if (gameStopped) return;
+
+        // move the players bats
+
+
+        // move the ball
+        Ball.moveObject(BallVelocity);
+
+        // check if someone has scored
+        if (checkScore()) {
+
+            // has one of the players won?
+            if (scorePlayer1 === scoreFinal) {
+
+                // print winning screen and stop the game
+                gameStopped = true;
+                return drawWinningScreen(Player1Name);
+            } else if (scorePlayer2 === scoreFinal) {
+
+                // print winning screen and stop the game
+                gameStopped = true;
+                return drawWinningScreen(Player2Name);
+            } else {
+
+                // nobody has won yet, so we are resetting the ball to the middle
+                resetBall();
+            }
+        }
+
+        // draw all game object onto the canvas
+        drawGame();
+
+        // rerun the engnie function
+        setTimeout(function(){
+            engine();
+        }, drawRate);
+    };
+
+    /**
+     * if a player has scored the players score is raised and true is returned
+     * @returns {boolean}
+     */
+    var checkScore = function(){
+
+        // check if player1 has scored
+        if (Ball.x >= canvasWidth) {
+            scorePlayer1++;
+            return true;
+        }
+
+        // check if player2 has scored
+        if (Ball.x <= 0) {
+            scorePlayer2++;
+            return true;
+        }
+
+        // nobody scored
+        return false;
+    };
+
+    /**
+     * (re)creates the ball game object and generates a random velocity for it
+     */
+    var resetBall = function(){
+
+        // (re)create game object
         Ball = new GameObject(
             canvasWidth / 2,
             canvasHeight / 2
         );
 
-        // draw the first frame (static at the moment)
-        self.draw();
+        // start moving the ball, but we have to determine in which direction
+        // which is done randomly
+        if (Math.random() > 0.5) {
+            BallVelocity = new Vector(gameSpeed * -1, 0);
+        } else {
+            BallVelocity = new Vector(gameSpeed, 0);
+        }
+    };
+
+
+    /**
+     * writes the winners name & reset information centered onto the canvas
+     * @param playerName
+     */
+    var drawWinningScreen = function(playerName) {
+
+        // clear all drawings from the canvas
+        canvasContext.fillStyle = colorBackground;
+        canvasContext.clearRect(
+            0,
+            0,
+            canvasWidth,
+            canvasHeight
+        );
+
+        // prepare the winner message
+        var winningMessage = playerName + ' has won!';
+
+        // draw the message
+        canvasContext.fillStyle = colorScores;
+        canvasContext.font = 'bold ' + winningMessageFontSize + 'px Courier New';
+        canvasContext.fillText(
+            winningMessage,
+            (canvasWidth / 2) - (canvasContext.measureText(winningMessage).width / 2),
+            (canvasHeight / 2) - (winningMessageFontSize / 2)
+        );
+
+        // draw reset information
+        var resetMessage = 'Press (R) to restart the game.';
+        canvasContext.font = 'bold ' + scoreFontSize + 'px Courier New';
+        canvasContext.fillText(
+            resetMessage,
+            (canvasWidth / 2) - (canvasContext.measureText(resetMessage).width / 2),
+            (canvasHeight / 2) + (winningMessageFontSize / 2)
+        );
     };
 
     /**
-     * draws all game obects onto the canvas
+     * draws all game objects onto the canvas
      */
-    this.draw = function(){
+    var drawGame = function(){
 
-        console.log('draw');
         // clear all drawings from the canvas
         canvasContext.fillStyle = colorBackground;
         canvasContext.clearRect(
@@ -97,7 +235,6 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
                 batWidth,
                 batHeight
             );
-            console.log('draw', bats[bat]);
         }
 
         // draw the ball
@@ -121,12 +258,9 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             scoreFontSize
         );
 
-        // calculate the width of the text of player2 to align it properly on the right
-        var player2TextWidth = (Player2Name.length + scorePlayer2.toString().length) * scoreFontSize;
-        console.log(Player2Name.length + scorePlayer2.toString().length, scoreFontSize, player2TextWidth);
         canvasContext.fillText(
             Player2Name + ' ' + scorePlayer2,
-            canvasWidth - player2TextWidth - batBorderSpacing,
+            canvasWidth - canvasContext.measureText(Player2Name + ' ' + scorePlayer2).width - batBorderSpacing,
             scoreFontSize
         );
     };
