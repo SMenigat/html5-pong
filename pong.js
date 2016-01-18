@@ -16,7 +16,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var scorePauseTimer = 1000; // in milliseconds
 
     // trigger that stops the game
-    var gameStopped = false;
+    var gameStopped = true;
 
     // canvas
     var gameCanvas = document.getElementById(gameCanvasNodeId);
@@ -74,22 +74,44 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // initialize the game canvas
         gameCanvas.style.backgroundColor = colorBackground;
 
+        // blur the game canvas because user needs to click the canvas to play
+        gameCanvas.blur();
+
         // update keymap on keydown / keyup
         gameCanvas.addEventListener('keydown', keyboardInputHandler);
         gameCanvas.addEventListener('keyup', keyboardInputHandler);
+        gameCanvas.addEventListener('blur', this.pause);
+        gameCanvas.addEventListener('focus', this.resume);
 
         // create the game objects & give the ball a random velocity and direction
         resetGameObjects();
 
-        // start the game engine
-        engine();
+        // game is started if screen is clicked
+        drawCenteredText(
+            'HTML5 Pong',
+            'Click the canvas to start the game.'
+        );
     };
 
     /**
-     * method stops the game engine
+     * method pauses the game engine
      */
-    this.stop = function(){
+    this.pause = function(){
         gameStopped = true;
+        drawCenteredText(
+            'Game Paused',
+            'Click the canvas to continue the game.'
+        );
+    };
+
+    /**
+     * resumes / restarts the game if paused or game has been ended
+     */
+    this.resume = function (){
+        if (gameStopped) {
+            gameStopped = false;
+            engine();
+        }
     };
 
     /**
@@ -182,7 +204,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
                 gameStopped = true;
                 return drawCenteredText(
                     Player1Name + ' has won!',
-                    'Press (R) to restart the game.'
+                    'Click the canvas to restart.'
                 );
             } else if (scorePlayer2 === scoreFinal) {
 
@@ -190,7 +212,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
                 gameStopped = true;
                 return drawCenteredText(
                     Player2Name + ' has won!',
-                    'Press (R) to restart the game.'
+                    'Click the canvas to restart.'
                 );
             } else {
 
