@@ -12,7 +12,7 @@ to get an idea on how to use it.
 
 You want to play and try it out directly? [Here you go!](https://rawgit.com/s4mware/html5-pong/master/pong-demo.html)
 
-# Controlls
+# Controls
 You are able to generate multiple pong game instances in one document. So if you want to play one of the games, you have
 to focus it first by clicking onto the wanted game.
 
