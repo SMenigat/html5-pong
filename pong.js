@@ -149,7 +149,6 @@ var PongGame = function(gameCanvasNodeId){
      */
     this.setConfiguration = function(configObject) {
         self.config = Object.deepExtend(self.config, configObject);
-        console.log('got', configObject, 'built', self.config);
 
         // reset difficulty to check if the set difficulty is ok (& from our enum)
         self.setDifficulty(self.config.difficulty);
@@ -407,13 +406,11 @@ var PongGame = function(gameCanvasNodeId){
 
         // are we to far too the top if we move the bat?
         if ((bat.y - (batHeight / 2)) + distance <= 0) {
-            console.log('bat too far up', (bat.y - (batHeight / 2)) + distance);
             return false;
         }
 
         // are we too far to the bottom if we move the bat?
         if ((bat.y + (batHeight / 2)) + distance >= canvasHeight) {
-            console.log('bat too far down', (bat.y + (batHeight / 2)) + distance);
             return false;
         }
 
