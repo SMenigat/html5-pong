@@ -8,6 +8,16 @@
 var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var self = this;
 
+    // configuration editable by user
+    self.config = {
+        colors: {
+            background: 'black',
+            bat: 'green',
+            ball: 'white',
+            scores: 'red'
+        }
+    };
+
     // game performance settings & timings
     var drawRate = 10; // in milliseconds
     var gameSpeed = 2;
@@ -23,12 +33,6 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var canvasWidth = gameCanvas.width;
     var canvasHeight = gameCanvas.height;
     var canvasContext = gameCanvas.getContext('2d');
-
-    // colors
-    var colorBackground = 'black';
-    var colorBat = 'green';
-    var colorBall = 'white';
-    var colorScores = 'red';
 
     // game object dimensions
     var batHeightRatio = 0.3;
@@ -90,7 +94,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     this.run = function () {
 
         // initialize the game canvas
-        gameCanvas.style.backgroundColor = colorBackground;
+        gameCanvas.style.backgroundColor = self.config.colors.background;
 
         // blur the game canvas because user needs to click the canvas to play
         gameCanvas.blur();
@@ -133,6 +137,10 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             gameStopped = false;
             engine();
         }
+    };
+
+    this.setConfiguration = function(configObject) {
+
     };
 
     /**
@@ -463,7 +471,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
      * clears all drawings from the canvas
      */
     var drawClear = function(){
-        canvasContext.fillStyle = colorBackground;
+        canvasContext.fillStyle = self.config.colors.background;
         canvasContext.clearRect(
             0,
             0,
@@ -483,7 +491,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         drawClear();
 
         // draw the message
-        canvasContext.fillStyle = colorScores;
+        canvasContext.fillStyle = self.config.colors.scores;
         canvasContext.font = 'bold ' + centeredMessageFontSize + 'px Courier New';
         canvasContext.fillText(
             FatText,
@@ -513,7 +521,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // draw player bats
         var bats = [Player1Bat, Player2Bat];
         for (var bat in bats) {
-            canvasContext.fillStyle = colorBat;
+            canvasContext.fillStyle = self.config.colors.bat;
             canvasContext.fillRect(
                 bats[bat].x - (batWidth / 2),
                 bats[bat].y - (batHeight / 2),
@@ -523,7 +531,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         }
 
         // draw the ball
-        canvasContext.fillStyle = colorBall;
+        canvasContext.fillStyle = self.config.colors.ball;
         canvasContext.beginPath();
         canvasContext.arc(
             Ball.x,
@@ -535,7 +543,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         canvasContext.fill();
 
         // draw the player's scores
-        canvasContext.fillStyle = colorScores;
+        canvasContext.fillStyle = self.config.colors.scores;
         canvasContext.font = 'bold ' + scoreFontSize + 'px Courier New';
 
         // player1
