@@ -116,7 +116,7 @@ There are some more methods available that you can use. Just have a look.
     
     // this is equal to:
     Game.setConfiguration({
-      difficulty: PongGame.aiDifficulty.hard
+      isMultiplayer: true
     });
 </script>
 ```
