@@ -15,6 +15,16 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             bat: 'green',
             ball: 'white',
             scores: 'red'
+        },
+        controls: {
+            Player1: {
+                up: 'w',
+                down: 's'
+            },
+            Player2: {
+                up: 'o',
+                down: 'l'
+            }
         }
     };
 
@@ -71,16 +81,6 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
     // input control's
     var keyboardInputEventMap = [];
-    var keyboardMapping = {
-        Player1: {
-            up: 'w',
-            down: 's'
-        },
-        Player2: {
-            up: 'o',
-            down: 'l'
-        }
-    };
     self.keyboardIO = {
         Player1Up: false,
         Player1Down: false,
@@ -425,16 +425,16 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var updateKeyboardIO = function(){
 
         // if player1 moves the bat
-        if (keyboardInputEventMap[keyboardMapping.Player1.up] || keyboardInputEventMap[keyboardMapping.Player1.down]) {
+        if (keyboardInputEventMap[self.config.controls.Player1.up] || keyboardInputEventMap[self.config.controls.Player1.down]) {
 
             // up
-            if (keyboardInputEventMap[keyboardMapping.Player1.up]) {
+            if (keyboardInputEventMap[self.config.controls.Player1.up]) {
                 self.keyboardIO.Player1Up = true;
                 self.keyboardIO.Player1Down = false;
             }
 
             // down
-            else if (keyboardInputEventMap[keyboardMapping.Player1.down]) {
+            else if (keyboardInputEventMap[self.config.controls.Player1.down]) {
                 self.keyboardIO.Player1Up = false;
                 self.keyboardIO.Player1Down = true;
             }
@@ -446,16 +446,16 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         }
 
         // if player2 moves the bat (just enabled if multiplayer is active)
-        if ((keyboardInputEventMap[keyboardMapping.Player2.up] || keyboardInputEventMap[keyboardMapping.Player2.down]) && isMultiplayer) {
+        if ((keyboardInputEventMap[self.config.controls.Player2.up] || keyboardInputEventMap[self.config.controls.Player2.down]) && isMultiplayer) {
 
             // up
-            if (keyboardInputEventMap[keyboardMapping.Player2.up]) {
+            if (keyboardInputEventMap[self.config.controls.Player2.up]) {
                 self.keyboardIO.Player2Up = true;
                 self.keyboardIO.Player2Down = false;
             }
 
             // down
-            else if (keyboardInputEventMap[keyboardMapping.Player2.down]) {
+            else if (keyboardInputEventMap[self.config.controls.Player2.down]) {
                 self.keyboardIO.Player2Up = false;
                 self.keyboardIO.Player2Down = true;
             }
