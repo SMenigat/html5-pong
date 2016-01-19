@@ -1,16 +1,29 @@
 /**
  * Transforms a given HTML5 canvas into a pong game
  * @param gameCanvasNodeId
- * @param Player1Name
- * @param Player2Name
+ * @param self.config.names.Player1
+ * @param self.config.names.Player2
  * @constructor
  */
-var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
+var PongGame = function(gameCanvasNodeId){
     var self = this;
+
+    // difficulty enumeration
+    self.aiDifficulty = {
+        easy: 0.6,
+        normal: 0.8,
+        hard: 1.0
+    };
 
     // configuration editable by user
     self.config = {
         isMultiplayer: false,
+        difficulty: self.aiDifficulty.normal,
+        finalScore: 5,
+        names: {
+            Player1: 'Player1',  
+            Player2: 'Player2'  
+        },
         colors: {
             background: 'black',
             bat: 'green',
@@ -65,19 +78,8 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var BallVelocity;
 
     // players & scores
-    if (!Player1Name) Player1Name = 'Player1';
-    if (!Player2Name) Player2Name = 'Player2';
-    var scoreFinal = 5;
     var scorePlayer1 = 0;
     var scorePlayer2 = 0;
-
-    // multiplayer options
-    this.aiDifficulty = {
-        easy: 0.6,
-        normal: 0.8,
-        hard: 1.0
-    };
-    var singleplayerDifficulty = this.aiDifficulty.normal;
 
     // input control's
     var keyboardInputEventMap = [];
@@ -91,7 +93,10 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     /**
      * initializes the game and starts the game loop
      */
-    this.run = function () {
+    this.run = function (configObj) {
+
+        // apply configuration if there is a custom config
+        if (configObj) this.setConfiguration(configObj);
 
         // initialize the game canvas
         gameCanvas.style.backgroundColor = self.config.colors.background;
@@ -100,7 +105,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         gameCanvas.blur();
 
         // rename player2 if ai is controlling it
-        if (!self.config.isMultiplayer) Player2Name = 'PongBot';
+        if (!self.config.isMultiplayer) self.config.names.Player2 = 'PongBot';
 
         // update keymap on keydown / keyup
         gameCanvas.addEventListener('keydown', keyboardInputHandler);
@@ -155,13 +160,13 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
      * sets difficulty for singleplayer game. if value not in aiDifficulty enum, difficulty is set to normal.
      * @param difficulty
      */
-    this.setSingleplayerDifficulty = function(difficulty) {
+    this.setDifficulty = function(difficulty) {
 
         // set default difficulty if given difficulty is not in enum
         if (Array.arrayValues(self.aiDifficulty).indexOf(difficulty) === -1) {
             difficulty = self.aiDifficulty.normal;
         }
-        singleplayerDifficulty = difficulty;
+        self.config.difficulty = difficulty;
     };
 
     /**
@@ -180,7 +185,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         if (!self.config.isMultiplayer) {
             if (Ball.y < Player2Bat.y) self.keyboardIO.Player2Up = true;
             if (Ball.y > Player2Bat.y) self.keyboardIO.Player2Down = true;
-            batSpeedPlayer2 = gameSpeed * singleplayerDifficulty;
+            batSpeedPlayer2 = gameSpeed * self.config.difficulty;
         }
 
         // move the players bats
@@ -246,14 +251,14 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         if (checkScore()) {
 
             // has one of the players won?
-            if (scorePlayer1 === scoreFinal || scorePlayer2 === scoreFinal) {
+            if (scorePlayer1 === self.config.finalScore || scorePlayer2 === self.config.finalScore) {
 
                 // we have to blur the canvas to make a restart possible
                 gameCanvas.blur();
 
                 // print winning screen
                 drawCenteredText(
-                    ((scorePlayer1 === scoreFinal) ? Player1Name : Player2Name) + ' has won!',
+                    ((scorePlayer1 === self.config.finalScore) ? self.config.names.Player1 : self.config.names.Player2) + ' has won!',
                     'Click the canvas to restart.'
                 );
 
@@ -548,15 +553,15 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
         // player1
         canvasContext.fillText(
-            Player1Name + ' ' + scorePlayer1,
+            self.config.names.Player1 + ' ' + scorePlayer1,
             batBorderSpacing,
             scoreFontSize
         );
 
         // player2
         canvasContext.fillText(
-            Player2Name + ' ' + scorePlayer2,
-            canvasWidth - canvasContext.measureText(Player2Name + ' ' + scorePlayer2).width - batBorderSpacing,
+            self.config.names.Player2 + ' ' + scorePlayer2,
+            canvasWidth - canvasContext.measureText(self.config.names.Player2 + ' ' + scorePlayer2).width - batBorderSpacing,
             scoreFontSize
         );
     };
