@@ -10,6 +10,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
     // configuration editable by user
     self.config = {
+        isMultiplayer: false,
         colors: {
             background: 'black',
             bat: 'green',
@@ -71,7 +72,6 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var scorePlayer2 = 0;
 
     // multiplayer options
-    var isMultiplayer = false;
     this.aiDifficulty = {
         easy: 0.6,
         normal: 0.8,
@@ -100,7 +100,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         gameCanvas.blur();
 
         // rename player2 if ai is controlling it
-        if (!isMultiplayer) Player2Name = 'PongBot';
+        if (!self.config.isMultiplayer) Player2Name = 'PongBot';
 
         // update keymap on keydown / keyup
         gameCanvas.addEventListener('keydown', keyboardInputHandler);
@@ -148,7 +148,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
      * @param multiplayer
      */
     this.setMultiplayer = function(multiplayer) {
-        isMultiplayer = multiplayer;
+        self.config.isMultiplayer = multiplayer;
     };
 
     /**
@@ -177,7 +177,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
         // singleplayer ai
         var batSpeedPlayer2 = gameSpeed;
-        if (!isMultiplayer) {
+        if (!self.config.isMultiplayer) {
             if (Ball.y < Player2Bat.y) self.keyboardIO.Player2Up = true;
             if (Ball.y > Player2Bat.y) self.keyboardIO.Player2Down = true;
             batSpeedPlayer2 = gameSpeed * singleplayerDifficulty;
@@ -446,7 +446,7 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         }
 
         // if player2 moves the bat (just enabled if multiplayer is active)
-        if ((keyboardInputEventMap[self.config.controls.Player2.up] || keyboardInputEventMap[self.config.controls.Player2.down]) && isMultiplayer) {
+        if ((keyboardInputEventMap[self.config.controls.Player2.up] || keyboardInputEventMap[self.config.controls.Player2.down]) && self.config.isMultiplayer) {
 
             // up
             if (keyboardInputEventMap[self.config.controls.Player2.up]) {
