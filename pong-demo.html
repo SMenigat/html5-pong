@@ -2,22 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HTML5 Pong</title>
+    <title>HTML5 Pong Demo</title>
+
+    <!-- Demo site CSS, not needed for PongGame library -->
+    <link rel="stylesheet" href="pong-demo.css">
+
+    <!-- Bootstrap: Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- jQuery: Latest compiled and minified JavaScript (Bootstrap needs it, not PongGame) -->
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js" ></script>
+
+    <!-- Bootstrap: Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <!-- PongGame: Latest JavaScript library -->
     <script src="pong.js" type="application/javascript"></script>
-    <script>
-        // initialize the game
-        window.onload = function () {
-            var Game = new PongGame('gameCanvas');
-            Game.run({
-                difficulty: PongGame.aiDifficulty.easy,
-                names: {
-                    Player1: 'PongPlayer'
-                }
-            });
-        };
-    </script>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600" tabindex="1"></canvas>
+    <div class="container">
+        <h1 class="page-header">
+            <a class="btn btn-primary" id="backButton" href="https://github.com/S4MWARE/html5-pong">
+                <span class="glyphicon glyphicon-arrow-left"></span>
+            </a>
+            HTML5 Pong Demo
+        </h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="canvasWrapper">
+                    <div>
+                        <canvas id="gameCanvas" tabindex="1"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" id="optionWrapper">
+                <h3>Controls Player1</h3>
+                <div class="input-group">
+                    <div class="input-group-addon">Bat Up</div>
+                    <input type="text" value="W" class="form-control" disabled="disabled">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">Bat Down</div>
+                    <input type="text" value="S" class="form-control" disabled="disabled">
+                </div>
+                <h3>Controls Player2</h3>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" onchange="toggleMultiplayer(this);" value="0">
+                        Enable Multiplayer (activates Player2)
+                    </label>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">Bat Up</div>
+                    <input type="text" value="O" class="form-control" disabled="disabled">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">Bat Down</div>
+                    <input type="text" value="L" class="form-control" disabled="disabled">
+                </div>
+                <h3>Themes</h3>
+                <button class="applyTheme btn btn-default" onclick="applyTheme('standard');">Standard Theme</button>
+                <button class="applyTheme btn btn-default" onclick="applyTheme('classic');">Classic Pong</button>
+                <button class="applyTheme btn btn-default" onclick="applyTheme('lego');">Lego Pong</button>
+                <button class="applyTheme btn btn-default" onclick="applyTheme('blackWhite');">Black and White</button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <script>
+        // initialize the game
+        var Game = new PongGame('gameCanvas');
+        Game.run({
+            difficulty: PongGame.aiDifficulty.easy,
+            names: {
+                Player1: 'PongPlayer'
+            }
+        });
+
+        /**
+         * applies a theme to the running pong game & redraws the canvas to make the change visable
+         * @param themeName
+         */
+        function applyTheme(themeName) {
+
+            // collection of all click-able themes
+            var allThemes = {
+                standard: {
+                    background: 'black',
+                    bat: 'green',
+                    ball: 'white',
+                    scores: 'red'
+                },
+                classic: {
+                    background: 'black',
+                    bat: 'green',
+                    ball: 'green',
+                    scores: 'gray'
+                },
+                lego: {
+                    background: 'blue',
+                    bat: 'yellow',
+                    ball: 'red',
+                    scores: 'white'
+                },
+                blackWhite: {
+                    background: 'white',
+                    bat: 'black',
+                    ball: 'black',
+                    scores: 'gray'
+                }
+            };
+
+            // apply new color config
+            Game.setConfiguration({
+                colors: allThemes[themeName]
+            });
+
+            // manually redraw
+            Game.resume();
+            Game.pause();
+        }
+
+        /**
+         * change event for multiplayer toggle checkbox
+         * @param checkbox
+         */
+        function toggleMultiplayer(checkbox) {
+            Game.setMultiplayer(checkbox.checked);
+
+            // we have to rename pongbot if this is a real player now
+            if(checkbox.checked) {
+                Game.setConfiguration({
+                    names: {
+                        Player2: 'AnotherPongPlayer'
+                    }
+                });
+            }
+        }
+
+
+
+    </script>
 </body>
 </html>
