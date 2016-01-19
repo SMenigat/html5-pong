@@ -9,7 +9,7 @@ var PongGame = function(gameCanvasNodeId){
     var self = this;
 
     // difficulty enumeration
-    self.aiDifficulty = {
+    PongGame.aiDifficulty = {
         easy: 0.6,
         normal: 0.8,
         hard: 1.0
@@ -18,7 +18,7 @@ var PongGame = function(gameCanvasNodeId){
     // configuration editable by user
     self.config = {
         isMultiplayer: false,
-        difficulty: self.aiDifficulty.normal,
+        difficulty: PongGame.aiDifficulty.normal,
         finalScore: 5,
         names: {
             Player1: 'Player1',  
@@ -170,8 +170,8 @@ var PongGame = function(gameCanvasNodeId){
     this.setDifficulty = function(difficulty) {
 
         // set default difficulty if given difficulty is not in enum
-        if (Array.arrayValues(self.aiDifficulty).indexOf(difficulty) === -1) {
-            difficulty = self.aiDifficulty.normal;
+        if (Array.arrayValues(PongGame.aiDifficulty).indexOf(difficulty) === -1) {
+            difficulty = PongGame.aiDifficulty.normal;
         }
         self.config.difficulty = difficulty;
     };
