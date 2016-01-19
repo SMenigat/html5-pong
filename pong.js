@@ -144,8 +144,15 @@ var PongGame = function(gameCanvasNodeId){
         }
     };
 
+    /**
+     * overwrites default config values with the given config object's values
+     * @param configObject
+     */
     this.setConfiguration = function(configObject) {
+        self.config = Object.deepExtend(self.config, configObject);
 
+        // reset difficulty to check if the set difficulty is ok (& from our enum)
+        self.setDifficulty(self.config.difficulty);
     };
 
     /**
@@ -599,21 +606,41 @@ var PongGame = function(gameCanvasNodeId){
         var self = this;
         this.x = x;
         this.y = y;
-    }
+    };
 
     /**
      * returns all values of an array like javascript object (array or object)
      * @param arrayLikeObject
      * @returns {Array}
      */
-    Array.prototype.arrayValues = function(arrayLikeObject){
-        if (typeof arrayLikeObject !== 'Object' && typeof arrayLikeObject !== 'Array') {
+    Array.arrayValues = function(arrayLikeObject){
+        if (typeof arrayLikeObject !== 'object') {
             throw new Error('Given arrayLikeObject is not array like!');
         }
         var values = [];
         for(key in arrayLikeObject) {
-            values.push(arrayLikeObject(key));
+            values.push(arrayLikeObject[key]);
         }
         return values;
+    };
+
+    /**
+     * nice method to deep extend JS objects. found here:
+     * http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
+     * @param destination
+     * @param source
+     * @returns {*}
+     */
+    Object.deepExtend = function(destination, source) {
+        for (var property in source) {
+            if (source[property] && source[property].constructor &&
+                source[property].constructor === Object) {
+                destination[property] = destination[property] || {};
+                arguments.callee(destination[property], source[property]);
+            } else {
+                destination[property] = source[property];
+            }
+        }
+        return destination;
     };
 };

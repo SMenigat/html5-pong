@@ -8,7 +8,12 @@
         // initialize the game
         window.onload = function () {
             var Game = new PongGame('gameCanvas');
-            Game.run();
+            Game.run({
+                difficulty: Game.aiDifficulty.easy,
+                names: {
+                    Player1: 'PongPlayer'
+                }
+            });
         };
     </script>
 </head>
