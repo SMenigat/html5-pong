@@ -65,6 +65,19 @@
                 <button class="applyTheme btn btn-default" onclick="applyTheme('classic');">Classic Pong</button>
                 <button class="applyTheme btn btn-default" onclick="applyTheme('lego');">Lego Pong</button>
                 <button class="applyTheme btn btn-default" onclick="applyTheme('blackWhite');">Black and White</button>
+                <h3>Difficulty</h3>
+                <label class="radio-inline">
+                    <input type="radio" name="difficulty" onclick="changeDifficulty(this);" data-difficulty="easy" checked="checked">
+                    Easy
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="difficulty" onclick="changeDifficulty(this);" data-difficulty="normal">
+                    Normal
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="difficulty" onclick="changeDifficulty(this);" data-difficulty="hard">
+                    Hard
+                </label>
             </div>
         </div>
         <hr />
@@ -140,8 +153,15 @@
             }
         }
 
-
-
+        /**
+         * change event for game difficulty
+         * @param radio
+         */
+        function changeDifficulty(radio) {
+            Game.setDifficulty(
+                PongGame.aiDifficulty[radio.getAttribute('data-difficulty')]
+            );
+        }
     </script>
 </body>
 </html>
