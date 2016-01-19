@@ -55,7 +55,15 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     var scoreFinal = 5;
     var scorePlayer1 = 0;
     var scorePlayer2 = 0;
-    var isMultiplayer = true;
+
+    // multiplayer options
+    var isMultiplayer = false;
+    this.aiDifficulty = {
+        easy: 0.6,
+        normal: 0.8,
+        hard: 1.0
+    };
+    var singleplayerDifficulty = this.aiDifficulty.normal;
 
     // input control's
     var keyboardInputMap = [];
@@ -76,6 +84,9 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
 
         // blur the game canvas because user needs to click the canvas to play
         gameCanvas.blur();
+
+        // rename player2 if ai is controlling it
+        if (!isMultiplayer) Player2Name = 'PongBot';
 
         // update keymap on keydown / keyup
         gameCanvas.addEventListener('keydown', keyboardInputHandler);
@@ -115,6 +126,27 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
     };
 
     /**
+     * switches gamemode between single and multiplayer
+     * @param multiplayer
+     */
+    this.setMultiplayer = function(multiplayer) {
+        isMultiplayer = multiplayer;
+    };
+
+    /**
+     * sets difficulty for singleplayer game. if value not in aiDifficulty enum, difficulty is set to normal.
+     * @param difficulty
+     */
+    this.setSingleplayerDifficulty = function(difficulty) {
+
+        // set default difficulty if given difficulty is not in enum
+        if (Array.arrayValues(self.aiDifficulty).indexOf(difficulty) === -1) {
+            difficulty = self.aiDifficulty.normal;
+        }
+        singleplayerDifficulty = difficulty;
+    };
+
+    /**
      * game engine, calculates positions of game objects and players scores
      */
     var engine = function(){
@@ -125,6 +157,14 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         // make raw keyboard inputs better handel'ble
         updateKeyboardIO();
 
+        // singleplayer ai
+        var batSpeedPlayer2 = gameSpeed;
+        if (!isMultiplayer) {
+            if (Ball.y < Player2Bat.y) self.keyboardIO.Player2Up = true;
+            if (Ball.y > Player2Bat.y) self.keyboardIO.Player2Down = true;
+            batSpeedPlayer2 = gameSpeed * singleplayerDifficulty;
+        }
+
         // move the players bats
         if (self.keyboardIO.Player1Up && canBatBeMovedOnYAxis(Player1Bat, (gameSpeed * 2) * -1)) {
             Player1Bat.moveObject(new Vector(0, (gameSpeed * 2) * -1));
@@ -132,11 +172,11 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         if (self.keyboardIO.Player1Down && canBatBeMovedOnYAxis(Player1Bat, (gameSpeed * 2))) {
             Player1Bat.moveObject(new Vector(0, (gameSpeed * 2)));
         }
-        if (self.keyboardIO.Player2Up && canBatBeMovedOnYAxis(Player2Bat, (gameSpeed * 2) * -1)) {
-            Player2Bat.moveObject(new Vector(0, (gameSpeed * 2) * -1));
+        if (self.keyboardIO.Player2Up && canBatBeMovedOnYAxis(Player2Bat, (batSpeedPlayer2 * 2) * -1)) {
+            Player2Bat.moveObject(new Vector(0, (batSpeedPlayer2 * 2) * -1));
         }
-        if (self.keyboardIO.Player2Down && canBatBeMovedOnYAxis(Player2Bat, (gameSpeed * 2))) {
-            Player2Bat.moveObject(new Vector(0, (gameSpeed * 2)));
+        if (self.keyboardIO.Player2Down && canBatBeMovedOnYAxis(Player2Bat, (batSpeedPlayer2 * 2))) {
+            Player2Bat.moveObject(new Vector(0, (batSpeedPlayer2 * 2)));
         }
 
         // check if ball colides with player1's bat
@@ -386,8 +426,8 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
             self.keyboardIO.Player1Down = false;
         }
 
-        // if player1 moves the bat
-        if (keyboardInputMap[79] || keyboardInputMap[76]) {
+        // if player2 moves the bat (just enabled if multiplayer is active)
+        if ((keyboardInputMap[79] || keyboardInputMap[76]) && isMultiplayer) {
 
             // up
             if (keyboardInputMap[79]) {
@@ -536,4 +576,20 @@ var PongGame = function(gameCanvasNodeId, Player1Name, Player2Name){
         this.x = x;
         this.y = y;
     }
+
+    /**
+     * returns all values of an array like javascript object (array or object)
+     * @param arrayLikeObject
+     * @returns {Array}
+     */
+    Array.prototype.arrayValues = function(arrayLikeObject){
+        if (typeof arrayLikeObject !== 'Object' && typeof arrayLikeObject !== 'Array') {
+            throw new Error('Given arrayLikeObject is not array like!');
+        }
+        var values = [];
+        for(key in arrayLikeObject) {
+            values.push(arrayLikeObject(key));
+        }
+        return values;
+    };
 };
