@@ -54,8 +54,10 @@ var PongGame = function(gameCanvasNodeId){
 
     // canvas
     var gameCanvas = document.getElementById(gameCanvasNodeId);
-    var canvasWidth = gameCanvas.width;
-    var canvasHeight = gameCanvas.height;
+    var canvasWidth = gameCanvas.offsetWidth;
+    var canvasHeight = gameCanvas.offsetHeight;
+    gameCanvas.setAttribute('width', canvasWidth);   // workaround to fix 2d context
+    gameCanvas.setAttribute('height', canvasHeight); // workaround to fix 2d context
     var canvasContext = gameCanvas.getContext('2d');
 
     // game object dimensions
@@ -98,9 +100,6 @@ var PongGame = function(gameCanvasNodeId){
         // apply configuration if there is a custom config
         if (configObj) this.setConfiguration(configObj);
 
-        // initialize the game canvas
-        gameCanvas.style.backgroundColor = self.config.colors.background;
-
         // blur the game canvas because user needs to click the canvas to play
         gameCanvas.blur();
 
@@ -119,7 +118,7 @@ var PongGame = function(gameCanvasNodeId){
         // game is started if screen is clicked
         drawCenteredText(
             'HTML5 Pong',
-            'Click the canvas to start the game.'
+            'Click here to start the game.'
         );
     };
 
@@ -130,7 +129,7 @@ var PongGame = function(gameCanvasNodeId){
         gameStopped = true;
         drawCenteredText(
             'Game Paused',
-            'Click the canvas to continue the game.'
+            'Click here to continue the game.'
         );
     };
 
@@ -150,6 +149,7 @@ var PongGame = function(gameCanvasNodeId){
      */
     this.setConfiguration = function(configObject) {
         self.config = Object.deepExtend(self.config, configObject);
+        console.log('got', configObject, 'built', self.config);
 
         // reset difficulty to check if the set difficulty is ok (& from our enum)
         self.setDifficulty(self.config.difficulty);
@@ -266,7 +266,7 @@ var PongGame = function(gameCanvasNodeId){
                 // print winning screen
                 drawCenteredText(
                     ((scorePlayer1 === self.config.finalScore) ? self.config.names.Player1 : self.config.names.Player2) + ' has won!',
-                    'Click the canvas to restart.'
+                    'Click here to restart.'
                 );
 
                 // reset the game, in case the game gets restarted
@@ -490,6 +490,9 @@ var PongGame = function(gameCanvasNodeId){
             canvasWidth,
             canvasHeight
         );
+
+        // apply background color
+        gameCanvas.style.backgroundColor = self.config.colors.background;
     };
 
     /**
