@@ -2,14 +2,14 @@
 
 Pong game written in vanilla JavaScript, utilising HTML5 Canvas. 
 
-You want to play and try it out? [Here you go!](https://rawgit.com/s4mware/html5-pong/master/pong-demo.html)
+You want to play and try it out? [Here you go!](https://rawgit.com/SMenigat/html5-pong/master/pong-demo.html)
 
 # Usage
 ## Installation
 In order to install `html5-pong` on your website you have to simply add the script file to your page. Please feel free to use the CDN version like in the example below.
 
 ```JavaScript
-<script type="application/javascript" src="https://rawgit.com/s4mware/html5-pong/master/pong.js" />
+<script type="application/javascript" src="https://rawgit.com/SMenigat/html5-pong/master/pong.js" />
 ```
 
 ## Setting up a game
